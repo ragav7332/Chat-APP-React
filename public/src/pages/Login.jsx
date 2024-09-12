@@ -39,27 +39,69 @@ export default function Login() {
     return true;
   };
 
+  // const handleSubmit = async (event) => {
+  //   event.preventDefault();
+  //   if (validateForm()) {
+  //     const { username, password } = values;
+  //     const { data } = await axios.post(loginRoute, {
+  //       username,
+  //       password,
+  //     });
+  //     if (data.status === false) {
+  //       toast.error(data.msg, toastOptions);
+  //     }
+  //     if (data.status === true) {
+  //       localStorage.setItem(
+  //         process.env.REACT_APP_LOCALHOST_KEY,
+  //         JSON.stringify(data.user)
+  //       );
+
+  //       navigate("/");
+  //     }
+  //   }
+  // };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    // Check if form is valid before making request
     if (validateForm()) {
-      const { username, password } = values;
-      const { data } = await axios.post(loginRoute, {
-        username,
-        password,
-      });
-      if (data.status === false) {
-        toast.error(data.msg, toastOptions);
-      }
-      if (data.status === true) {
-        localStorage.setItem(
-          process.env.REACT_APP_LOCALHOST_KEY,
-          JSON.stringify(data.user)
-        );
-
-        navigate("/");
+      try {
+        const { username, password } = values;
+  
+        // Send a POST request to the login route
+        const response = await axios.post(loginRoute, {
+          username,
+          password,
+        });
+  
+        const { data } = response;
+  
+        // Handle incorrect username or password
+        if (!data.status) {
+          toast.error(data.msg, toastOptions);
+        } 
+        
+        // Handle successful login
+        if (data.status) {
+          // Store user data in local storage
+          localStorage.setItem(
+            process.env.REACT_APP_LOCALHOST_KEY,
+            JSON.stringify(data.user)
+          );
+  
+          // Navigate to the home page after login
+          navigate("/");
+        }
+  
+      } catch (error) {
+        // Handle any network or server errors
+        toast.error("Something went wrong. Please try again.", toastOptions);
+        console.error("Login error:", error);
       }
     }
   };
+  
 
   return (
     <>
